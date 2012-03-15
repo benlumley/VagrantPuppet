@@ -1,0 +1,33 @@
+# a really simple single node config file
+
+class www1 {
+
+  include apt
+  include nginx
+  include nginx::fcgi
+  include php5
+  include mysql
+
+  # vcap.me is a domain owned by VMWARE, which points to 127.0.0.1, as does *.vcap.me - so we can avoid using
+  # the hosts file, which I prefer. Access site via something.vcap.me:8080 (or whatever port you've forwarded).
+  nginx::fcgi::site {"sitename":
+    root            => "/vagrant/www",
+    fastcgi_pass    => "127.0.0.1:9000",
+    server_name     => ["localhost", "something.vcap.me"],
+  }
+
+  # for use on a host only network - don't leave it like this if you use bridged 
+  # networking or port forwarding and work on public networks
+  mysql::user { "root":
+    database => "*",
+    host     => "%",
+    password => "",
+  }
+
+  mysql::database { "dbname":
+
+  }
+
+}
+
+include www1
