@@ -4,7 +4,7 @@
 Vagrant::Config.run do |config|
   config.vm.guest = :debian
   config.vm.box = "bl-squeeze64"
-  config.vm.box_url = "http://puppetlabs.s3.amazonaws.com/pub/squeeze64.box"
+  config.vm.box_url = "https://github.com/benlumley/VagrantBoxes/raw/master/bl-squeeze64.box"
 
   # needed for nfs shares
   config.vm.network :hostonly, "33.33.33.10"
