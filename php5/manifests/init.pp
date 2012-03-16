@@ -9,7 +9,10 @@
 #
 class php5 {
 
-	package { [ php5-fpm, php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache ]: ensure => installed	}
+	package { [ php5-fpm, php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite ]: 
+		ensure => installed,
+		notify => Exec["reload-php5-fpm"],
+	}
 
 	service { php5-fpm:
 		ensure => running,
@@ -24,6 +27,7 @@ class php5 {
 		mode	=> 644,
 		content => template("php5/php5-fpm.conf.erb"),
 		require => Package["php5-fpm"],
+		notify => Exec["reload-php5-fpm"],
 	}
 
 	file{"/etc/php5/fpm/fpm.d":
@@ -36,7 +40,7 @@ class php5 {
 	}
 
 	exec{"reload-php5-fpm":
-		command => "/etc/init.d/php5-fpm reload",
+		command => "/etc/init.d/php5-fpm restart",
     refreshonly => true,
 		require => File["/etc/php5/fpm/php5-fpm.conf"],
   }
@@ -83,11 +87,11 @@ class php5 {
 
   define config ( $ensure = 'present', $content = '', $order="500") {
 		$real_content = $content ? { 
-			'' => template("php5/conf.d/${name}.conf.erb"),
+			'' => template("php5/conf.d/${name}.ini.erb"),
   		default => $content,
 	  }
 
-		file { "/etc/php5/conf.d/${order}-${name}.conf":
+		file { "/etc/php5/conf.d/${order}-${name}.ini":
 			ensure => $ensure,
 			content => $real_content,
 			mode => 644,

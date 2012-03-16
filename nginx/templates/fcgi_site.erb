@@ -1,5 +1,7 @@
 server {
-  listen   <%= listen %> ;
+  
+  <% listen.each do |port| -%>listen <%= port %>;
+  <% end -%>
 
   server_name  <% real_server_name.each do |s_n| -%><%= s_n %> <% end -%>;
 
