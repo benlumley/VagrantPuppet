@@ -1,12 +1,12 @@
 server {
   listen   <%= listen %> ;
 
-	server_name  <% real_server_name.each do |s_n| -%><%= s_n %> <% end -%>;
+  server_name  <% real_server_name.each do |s_n| -%><%= s_n %> <% end -%>;
 
   access_log  <%= real_access_log %>;
+  error_log  <%= real_error_log %>;
 
-	root <%= root %>;
-
+  root <%= root %>;
 
   <% if listen == '443' %>
     ssl  on;
@@ -19,29 +19,28 @@ server {
     ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
     ssl_prefer_server_ciphers   on;
   <% end -%>
+
   location / {
-		index   <%= index %>;
-    try_files $uri $uri/ @rewrite;
+    index   <%= index %>;
+    try_files $uri $uri @rewrite;
   }
   
   location @rewrite {
-    # Some modules enforce no slash (/) at the end of the URL
-    # Else this rewrite block wouldn't be needed (GlobalRedirect)
-    rewrite ^/(.*)$ /index.php?q=$1;
+    rewrite ^(.*)$ /<%= index %>/$1 last;
   }
 
-	location ~ \.php$ {
-		fastcgi_pass <%= fastcgi_pass %>;
-		fastcgi_index index.php;
-		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		include /etc/nginx/includes/fastcgi_params.inc;
-	}
+  location ~ ^/( <%= real_allowed_php %>)\.php(/|$) {
+    fastcgi_pass <%= fastcgi_pass %>;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include /etc/nginx/includes/fastcgi_params.inc;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+  }
 
-	location ~ /\.ht {
+  location ~ /\.ht {
     deny  all;
   }
 
   <% if include  != '' %>	<%include.each do |inc| %>include <%= inc %>;
-	<% end -%><% end -%>
+  <% end -%><% end -%>
 }
 
