@@ -38,12 +38,12 @@ define nginx::fcgi::site(
   $fastcgi_pass,
   $ensure              = 'present',
   $index               = 'index.php',
-  $allowed_php         = 'undef'
+  $allowed_php         = 'index',
   $include             = '',
   $listen              = '80',
   $server_name         = undef,
   $access_log          = undef,
-  $error_log           = undef
+  $error_log           = undef,
   $ssl_certificate     = undef,
   $ssl_certificate_key = undef,
   $ssl_session_timeout = '5m') {
@@ -62,12 +62,6 @@ define nginx::fcgi::site(
     undef   => "/var/log/nginx/${name}_error.log",
     default => $error_log,
   }
-
-  $real_allowed_php = $allowed_php ? {
-    undef   => "index",
-    default => $allowed_php,
-  }
-  
 
   # Autogenerating ssl certs
   if $listen == '443' and  $ensure == 'present' and ($ssl_certificate == undef or $ssl_certificate_key == undef) {

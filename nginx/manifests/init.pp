@@ -63,6 +63,7 @@ class nginx {
     owner   => 'root',
     group   => 'root',
     require => Package['nginx'],
+    notify  => Exec['reload-nginx'],
   }
 
   file { '/etc/nginx/ssl':
@@ -71,6 +72,7 @@ class nginx {
     owner   => 'root',
     group   => 'root',
     require => Package['nginx'],
+    notify  => Exec['reload-nginx'],
   }
 
   file { $nginx_includes:
@@ -79,11 +81,13 @@ class nginx {
     owner   => 'root',
     group   => 'root',
     require => Package['nginx'],
+    notify  => Exec['reload-nginx'],
   }
 
   # Nuke default files
   file { '/etc/nginx/fastcgi_params':
     ensure  => absent,
+    notify  => Exec['reload-nginx'],
     require => Package['nginx'],
   }
 

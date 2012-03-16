@@ -29,7 +29,7 @@ server {
     rewrite ^(.*)$ /<%= index %>/$1 last;
   }
 
-  location ~ ^/( <%= real_allowed_php %>)\.php(/|$) {
+  location ~ ^/(<%= allowed_php %>)\.php(/|$) {
     fastcgi_pass <%= fastcgi_pass %>;
     fastcgi_split_path_info ^(.+\.php)(/.*)$;
     include /etc/nginx/includes/fastcgi_params.inc;
