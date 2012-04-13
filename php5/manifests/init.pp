@@ -39,10 +39,28 @@ class php5 {
 		require => Package["php5-fpm"],
 	}
 
+	file { "/etc/php5/fpm/pool.d":
+		ensure => directory,
+		checksum => mtime,
+		owner	=> root,
+		group	=> root,
+		mode	=> 644,
+		require => Package["php5-fpm"],
+		purge => true,
+		recurse => true
+	}
+
 	exec{"reload-php5-fpm":
 		command => "/etc/init.d/php5-fpm restart",
     refreshonly => true,
 		require => File["/etc/php5/fpm/php5-fpm.conf"],
+  }
+
+  class apc {
+  	package { "php5-apc": 
+  		ensure => present,
+  		notify => Exec["reload-php5-fpm"]
+  	}
   }
 
 	# Define : php5-fpm::config
@@ -94,6 +112,18 @@ class php5 {
 		file { "/etc/php5/conf.d/${order}-${name}.ini":
 			ensure => $ensure,
 			content => $real_content,
+			mode => 644,
+			owner => root,
+			group => root,
+			notify => Exec["reload-php5-fpm"],
+			before => Service["php5-fpm"],
+		}
+  }
+
+  define fpmpool( $ensure = 'present', $port = 9000 ) {
+		file { "/etc/php5/fpm/pool.d/${name}.conf":
+			ensure => $ensure,
+			content => template('php5/pool.d/pool.conf.erb'),
 			mode => 644,
 			owner => root,
 			group => root,
