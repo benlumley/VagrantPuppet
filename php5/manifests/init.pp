@@ -9,57 +9,79 @@
 #
 class php5 {
 
-	package { [ php5-fpm, php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite ]: 
+	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite ]: 
 		ensure => installed,
-		notify => Exec["reload-php5-fpm"],
+		notify => Exec["reload-php"],
 	}
 
-	service { php5-fpm:
-		ensure => running,
-		enable => true,
-		require => File["/etc/php5/fpm/php5-fpm.conf"],
-	}
+ 	class fpm {
 
-	file{"/etc/php5/fpm/php5-fpm.conf":
-		ensure => present,
-		owner	=> root,
-		group	=> root,
-		mode	=> 644,
-		content => template("php5/php5-fpm.conf.erb"),
-		require => Package["php5-fpm"],
-		notify => Exec["reload-php5-fpm"],
-	}
+		package { [ php5-fpm ]: 
+			ensure => installed,
+			notify => Exec["reload-php"],
+		}
 
-	file{"/etc/php5/fpm/fpm.d":
-		ensure => directory,
-		checksum => mtime,
-		owner	=> root,
-		group	=> root,
-		mode	=> 644,
-		require => Package["php5-fpm"],
-	}
+		service { php5-fpm:
+			ensure => running,
+			enable => true,
+			require => File["/etc/php5/fpm/php5-fpm.conf"],
+		}
 
-	file { "/etc/php5/fpm/pool.d":
-		ensure => directory,
-		checksum => mtime,
-		owner	=> root,
-		group	=> root,
-		mode	=> 644,
-		require => Package["php5-fpm"],
-		purge => true,
-		recurse => true
-	}
+		file{"/etc/php5/fpm/php5-fpm.conf":
+			ensure => present,
+			owner	=> root,
+			group	=> root,
+			mode	=> 644,
+			content => template("php5/php5-fpm.conf.erb"),
+			require => Package["php5-fpm"],
+			notify => Exec["reload-php"],
+		}
 
-	exec{"reload-php5-fpm":
-		command => "/etc/init.d/php5-fpm restart",
-    refreshonly => true,
-		require => File["/etc/php5/fpm/php5-fpm.conf"],
-  }
+		file{"/etc/php5/fpm/fpm.d":
+			ensure => directory,
+			checksum => mtime,
+			owner	=> root,
+			group	=> root,
+			mode	=> 644,
+			require => Package["php5-fpm"],
+		}
+
+		file { "/etc/php5/fpm/pool.d":
+			ensure => directory,
+			checksum => mtime,
+			owner	=> root,
+			group	=> root,
+			mode	=> 644,
+			require => Package["php5-fpm"],
+			purge => true,
+			recurse => true
+		}
+
+		exec{"reload-php":
+			command => "/etc/init.d/php5-fpm restart",
+		    refreshonly => true,
+			require => File["/etc/php5/fpm/php5-fpm.conf"],
+	  	}
+	}	
+
+	class apache2 {
+		exec{"reload-php":
+			command => "/etc/init.d/apache2 restart",
+		    refreshonly => true,
+		    require => Package['apache2']
+	  	}
+
+	  	package{'libapache2-mod-php5':
+	  		ensure=>'installed',
+	  		notify => Exec['reload-php']
+	  	}
+
+	}
 
   class apc {
   	package { "php5-apc": 
   		ensure => present,
-  		notify => Exec["reload-php5-fpm"]
+  		notify => Exec["reload-php"]
   	}
   }
 
@@ -84,7 +106,7 @@ class php5 {
 	#	}
 	#	
 
-	php5::config { 'dev': }
+  php5::config { 'dev': }
 
   define fpmconfig ( $ensure = 'present', $content = '', $order="500") {
 		$real_content = $content ? { 
@@ -98,8 +120,7 @@ class php5 {
 			mode => 644,
 			owner => root,
 			group => root,
-			notify => Exec["reload-php5-fpm"],
-			before => Service["php5-fpm"],
+			notify => Exec["reload-php"],
 		}
   }
 
@@ -115,8 +136,7 @@ class php5 {
 			mode => 644,
 			owner => root,
 			group => root,
-			notify => Exec["reload-php5-fpm"],
-			before => Service["php5-fpm"],
+			notify => Exec["reload-php"],
 		}
   }
 
@@ -127,8 +147,7 @@ class php5 {
 			mode => 644,
 			owner => root,
 			group => root,
-			notify => Exec["reload-php5-fpm"],
-			before => Service["php5-fpm"],
+			notify => Exec["reload-php"],
 		}
   }
 
