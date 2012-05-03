@@ -23,6 +23,13 @@ class mysql {
     notify  => Service[ "mysql" ]
   }
 
+  file { '/etc/mysql/user_check.sh':
+    source => 'puppet:///modules/mysql/user_check.sh',
+    mode   => '0755',
+    owner  => 'root',
+    group  => 'root'
+  }
+
   # some mysql versions like to make a test db. I DO NOT WANT THAT
   exec { "remove test db":
     require => [ Package[ "mysql-server" ], Package[ "mysql-client" ] ],
@@ -45,10 +52,10 @@ class mysql {
     $host = 'localhost'
   ) {
     exec { "Add User ($name) To A Database":
-      require => [ Package[ "mysql-server" ], Package[ "mysql-client" ] ],
-      unless  => "/usr/bin/mysql -u $name -p'$password' -e 'show status;'",
+      require => [ Package[ "mysql-server" ], Package[ "mysql-client" ], File['/etc/mysql/user_check.sh'] ],
+      unless  => "/etc/mysql/user_check.sh $name $host",
       command => "/usr/bin/mysql -u root -e \"GRANT ALL ON $database.* TO '$name'@'$host' IDENTIFIED BY '$password'; FLUSH PRIVILEGES;\"",
-      notify  => Service[ "mysql" ]
+      notify  => Service[ "mysql" ],
     }
   }
 
