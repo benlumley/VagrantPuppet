@@ -19,7 +19,7 @@ $apache_includes = "/etc/apache2/site-includes"
 $apache_mods = "/etc/apache2/mods"
 $apache_conf = "/etc/apache2/conf.d"
 
-  $real_apache2_mpm = $apache2_mpm ? { '' => 'worker', default => $apache2_mpm }
+  $real_apache2_mpm = $apache2_mpm ? { '' => 'prefork', default => $apache2_mpm }
   
   case $real_apache2_mpm {
     'event': {
@@ -60,12 +60,7 @@ $apache_conf = "/etc/apache2/conf.d"
 	  require => Package[apache2_mpm_provider],
 	}
 
-  package { libapache2-mod-fastcgi:
-    ensure => installed,
-    require => Package[apache2],
-  }
-
-	service { apache2:
+  service { apache2:
 		ensure => running,
 		pattern => "/usr/sbin/apache2",
 		hasrestart => true,
@@ -151,63 +146,56 @@ $apache_conf = "/etc/apache2/conf.d"
   # You can add a custom require (string) if the site depends on packages
   # that aren't part of the default apache2 package. Because of the
   # package dependencies, apache2 will automagically be included.
-  define site ( $ensure = 'present', $content = '' ) {
+  define site ( 
+    $ensure = 'present',
+    $root = '/vagrant/web',
+    $index = 'index.php',
+    $servername = '',
+    $serveralias = '',
+    $customcontent = ''
+  ) {
   	case $ensure {
   		'present' : {
         apache2::install_site { $name:
-          content => $content
-        }
-  		}
-  		'installed' : {
-        apache2::install_site { $name:
-          content => $content
+          root => $root,
+          index => $index,
+          servername => $servername,
+          serveralias => $serveralias,
+          customcontent => $customcontent
         }
   		}
   		'absent' : {
-  			exec { "/usr/sbin/a2dissite $name":
-  				onlyif => "/bin/sh -c '[ -L ${apache_sites}-enabled/$name ] \\
-  							&& [ ${apache_sites}-enabled/$name -ef ${apache_sites}-available/$name ]'",
-  				notify => Exec["reload-apache2"],
-  				require => Package["apache2"],
-  			}
-  		}
+        file { "${apache2::apache_sites}-enabled/$name.conf":
+          ensure => 'absent',
+          notify =>  Exec["reload-apache2"]
+    		}
+      }
   		default: { err ( "Unknown ensure value: '$ensure'" ) }
   	}
   }
 
   # helper method to actually install a site -- called by site()
-  define install_site ($content = '' ) {
-	  # first, make sure the site config exists
-    case $content {
-      '': {
-        file { "${apache2::apache_sites}-available/${name}":
-          mode => 644,
-      	  owner => root,
-      	  group => root,
-    	    ensure => present,
-    	    alias => "site-$name",
-        }
-      }
-
-      default: {
-    	  file { "${apache2::apache_sites}-available/${name}":
-          content => $content,
-          mode => 644,
-      	  owner => root,
-      	  group => root,
-  	      ensure => present,
-  	      alias => "site-$name",  
-        }        
-      }
+  define install_site (
+    $root = '',
+    $index = '',
+    $servername = '',
+    $serveralias = '',
+    $customcontent = ''
+  ) {
+    file { "${apache2::apache_sites}-available/${name}.conf":
+      mode => 644,
+      owner => root,
+      group => root,
+      ensure => present,
+      alias => "site-$name",
+      content => template('apache2/vhost.conf.erb')
     }
-	  
-	  # now, enable it.
-		exec { "/usr/sbin/a2ensite $name":
-			unless => "/bin/sh -c '[ -L ${apache_sites}-enabled/$name ] \\
-						&& [ ${apache_sites}-enabled/$name -ef ${apache_sites}-available/$name ]'",
-			notify => Exec["reload-apache2"],
-			require => File["site-$name"],
-		}
+    	  
+    file { "${apache2::apache_sites}-enabled/$name.conf":
+      ensure => "${apache2::apache_sites}-available/$name.conf",
+      notify => Exec["reload-apache2"],
+      require => File["${apache2::apache_sites}-available/$name.conf"]
+    }
 	}
 
   # Define a site config fragment
@@ -239,6 +227,7 @@ $apache_conf = "/etc/apache2/conf.d"
   				unless => "/bin/sh -c '[ -L ${apache2::apache_mods}-enabled/${name}.load ] \\
   					&& [ ${apache2::apache_mods}-enabled/${name}.load -ef ${apache2::apache_mods}-available/${name}.load ]'",
   				notify => Exec["force-reload-apache2"],
+          require => Package['apache2']
   			}
   		}
   		'absent': {

@@ -12,13 +12,8 @@ class apache2::debian inherits apache2 {
 
   apache2::module { ["alias", "auth_basic", "authn_file", 
     "authz_default", "authz_groupfile", "authz_host", 
-    "authz_user", "autoindex", "cgid", "dir", "env", "mime", 
+    "authz_user", "autoindex", "dir", "env", "mime", 
     "negotiation", "setenvif", "status", "rewrite", "actions" ]:
     ensure=> present,
-  }
-
-  apache2::module { 'fastcgi': 
-    require => PAckage['libapache2-mod-fastcgi'],
-    ensure => 'present'
   }
 }
