@@ -46,7 +46,7 @@ class mysql {
   ) {
     exec { "Add User ($name) To A Database":
       require => [ Package[ "mysql-server" ], Package[ "mysql-client" ] ],
-      unless  => "/usr/bin/mysql -u $name -p'$password' $database -e 'show status;'",
+      unless  => "/usr/bin/mysql -u $name -p'$password' -e 'show status;'",
       command => "/usr/bin/mysql -u root -e \"GRANT ALL ON $database.* TO '$name'@'$host' IDENTIFIED BY '$password'; FLUSH PRIVILEGES;\"",
       notify  => Service[ "mysql" ]
     }

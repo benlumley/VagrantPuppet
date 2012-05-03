@@ -1,5 +1,7 @@
 server {
-  listen   <%= listen %> ;
+  
+  <% listen.each do |port| -%>listen <%= port %>;
+  <% end -%>
 
   server_name  <% real_server_name.each do |s_n| -%><%= s_n %> <% end -%>;
 
@@ -22,11 +24,11 @@ server {
 
   location / {
     index   <%= index %>;
-    try_files $uri $uri @rewrite;
+    try_files $uri $uri/ @rewrite;
   }
   
   location @rewrite {
-    rewrite ^(.*)$ /<%= index %>/$1 last;
+    rewrite ^(.*)$ /<%= index %>$1 last;
   }
 
   location ~ ^/(<%= allowed_php %>)\.php(/|$) {

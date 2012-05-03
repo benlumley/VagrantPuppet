@@ -1,7 +1,5 @@
-; Start a new pool named 'www'
-; The name is used in logs and stats
-; There is no limitation of the number of pool FPM can handle. Your system will tell you anyway :)
-[www]
+; Start a new pool 
+[<%= name %>]
 
 ; Address to accept fastcgi requests on.
 ; Valid syntaxes are:
@@ -11,7 +9,7 @@
 ; it's mandatory
 ;
 ;listen = /var/run/php5-fpm.sock
-listen = 127.0.0.1:9000
+listen = 127.0.0.1:<%= port %>
 
 ; Set listen(2) backlog
 ; -1 means unlimited
@@ -64,7 +62,7 @@ pm = static
 ; Used with any pm.style.
 ; It's mandatory
 ;
-pm.max_children = 10
+pm.max_children = 2
 
 ; Sets the number of server processes created on startup.
 ; Used only with 'dynamic' pm.style
@@ -90,7 +88,7 @@ pm.max_children = 10
 ; Equivalent to PHP_FCGI_MAX_REQUESTS
 ; default : 0
 ;
-;pm.max_requests = 500
+pm.max_requests = 10
 
 ; Sets the status URI to call to obtain php5-fpm status page.
 ; If not set, no URI will be recognized as a status page.

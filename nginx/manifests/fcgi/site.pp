@@ -40,7 +40,7 @@ define nginx::fcgi::site(
   $index               = 'index.php',
   $allowed_php         = 'index',
   $include             = '',
-  $listen              = '80',
+  $listen              = [ '80', '8080' ],
   $server_name         = undef,
   $access_log          = undef,
   $error_log           = undef,
