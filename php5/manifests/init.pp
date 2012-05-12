@@ -10,14 +10,14 @@
 class php5 {
 
 	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite ]: 
-		ensure => installed,
+		ensure => latest,
 		notify => Exec["reload-php"],
 	}
 
  	class fpm {
 
 		package { [ php5-fpm ]: 
-			ensure => installed,
+			ensure => latest,
 			notify => Exec["reload-php"],
 		}
 
@@ -72,7 +72,7 @@ class php5 {
 	  	}
 
 	  	package{'libapache2-mod-php5':
-	  		ensure=>'installed',
+	  		ensure=>'latest',
 	  		notify => Exec['reload-php']
 	  	}
 
@@ -80,7 +80,7 @@ class php5 {
 
   class apc {
   	package { "php5-apc": 
-  		ensure => present,
+  		ensure => latest,
   		notify => Exec["reload-php"]
   	}
   }

@@ -5,7 +5,7 @@
 class mysql {
 
 	package { [ "mysql-server", 'mysql-client', 'php5-mysql' ]:
-		ensure => installed,
+		ensure => latest,
 	}
 
 	service { mysql:

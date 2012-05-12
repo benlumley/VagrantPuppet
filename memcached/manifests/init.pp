@@ -1,6 +1,6 @@
 class memcached {
   package { 'memcached':
-    ensure => 'present'
+    ensure => 'latest'
   }
 
   service { 'memcached':

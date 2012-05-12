@@ -1,6 +1,6 @@
 class postfix {
   package { 'postfix':
-    ensure => 'present'
+    ensure => 'latest'
   }
 
   service { 'postfix':

@@ -24,7 +24,7 @@ $apache_conf = "/etc/apache2/conf.d"
   case $real_apache2_mpm {
     'event': {
       package { "apache2-mpm-event": 
-        ensure => installed,
+        ensure => latest,
         alias => apache2_mpm_provider
       }
       package { ["apache2-mpm-perchild", "apache2-mpm-prefork",
@@ -35,7 +35,7 @@ $apache_conf = "/etc/apache2/conf.d"
     
     'prefork': {
       package { "apache2-mpm-prefork": 
-        ensure => installed,
+        ensure => latest,
         alias => apache2_mpm_provider
       }
       package { ["apache2-mpm-event", "apache2-mpm-perchild",
@@ -46,7 +46,7 @@ $apache_conf = "/etc/apache2/conf.d"
 
     'worker': {
       package { "apache2-mpm-worker": 
-        ensure => installed,
+        ensure => latest,
         alias => apache2_mpm_provider
       }
       package { ["apache2-mpm-event", "apache2-mpm-perchild",
@@ -56,7 +56,7 @@ $apache_conf = "/etc/apache2/conf.d"
     }
   }
 	package { apache2:
-		ensure => installed,
+		ensure => latest,
 	  require => Package[apache2_mpm_provider],
 	}
 

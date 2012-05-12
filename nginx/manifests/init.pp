@@ -38,7 +38,7 @@ class nginx {
     default => $::nginx_worker_connections
   }
 
-  if ! defined(Package['nginx']) { package { 'nginx': ensure => installed }}
+  if ! defined(Package['nginx']) { package { 'nginx': ensure => latest }}
 
   service { 'nginx':
     ensure     => running,
