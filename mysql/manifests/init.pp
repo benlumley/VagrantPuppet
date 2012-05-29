@@ -27,7 +27,8 @@ class mysql {
     source => 'puppet:///modules/mysql/user_check.sh',
     mode   => '0755',
     owner  => 'root',
-    group  => 'root'
+    group  => 'root',
+    require => [ Package[ "mysql-server" ], Package[ "mysql-client" ] ],
   }
 
   # some mysql versions like to make a test db. I DO NOT WANT THAT

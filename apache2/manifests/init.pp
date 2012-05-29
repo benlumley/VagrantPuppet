@@ -188,7 +188,9 @@ $apache_conf = "/etc/apache2/conf.d"
       group => root,
       ensure => present,
       alias => "site-$name",
-      content => template('apache2/vhost.conf.erb')
+      content => template('apache2/vhost.conf.erb'),
+      require => Package['apache2'],
+      notify => Exec["reload-apache2"],
     }
     	  
     file { "${apache2::apache_sites}-enabled/$name.conf":
