@@ -69,13 +69,13 @@ PidFile /var/run/apache2.pid
 #
 # Timeout: The number of seconds before receives and sends time out.
 #
-Timeout 300
+Timeout 120
 
 #
 # KeepAlive: Whether or not to allow persistent connections (more than
 # one request per connection). Set to "Off" to deactivate.
 #
-KeepAlive On
+KeepAlive Off
 
 #
 # MaxKeepAliveRequests: The maximum number of requests to allow
@@ -101,11 +101,11 @@ KeepAliveTimeout 15
 # MaxClients: maximum number of server processes allowed to start
 # MaxRequestsPerChild: maximum number of requests a server process serves
 <IfModule mpm_prefork_module>
-    StartServers          5
+    StartServers          1
     MinSpareServers       5
-    MaxSpareServers      10
-    MaxClients          150
-    MaxRequestsPerChild   0
+    MaxSpareServers       5
+    MaxClients            20
+    MaxRequestsPerChild   200
 </IfModule>
 
 # worker MPM
