@@ -9,7 +9,7 @@
 #
 class php5 {
 
-	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite ]: 
+	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite, php5-dev, php-pear ]: 
 		ensure => latest,
 		notify => Exec["reload-php"],
 	}
