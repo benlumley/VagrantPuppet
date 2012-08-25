@@ -153,7 +153,7 @@ define download ($uri, $timeout = 300) {
   exec {
     "download $uri":
         command => "wget -q '$uri' -O $name",
-        creates => $name,
+        creates => "$name",
         timeout => $timeout,
         require => Package[ "wget" ],
   }
