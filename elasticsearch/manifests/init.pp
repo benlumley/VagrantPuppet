@@ -1,5 +1,5 @@
 class elasticsearch::params {
-  $version = "0.18.7"
+  $version = "0.19.8"
   $java_package = "openjdk-6-jre-headless"
   $dbdir = "/var/lib/elasticsearch"
   $logdir = "/var/log/elasticsearch"
@@ -17,13 +17,21 @@ class elasticsearch(
   $sharedirv = "/usr/share/elasticsearch-${version}"
   $sharedir = "/usr/share/elasticsearch"
   $etcdir = "/etc/elasticsearch"
-  $upstartfile = "/etc/init/elasticsearch.conf"
+  $initscript = "/etc/init.d/elasticsearch"
   $defaultsfile = "/etc/default/elasticsearch"
   $configfile = "$etcdir/elasticsearch.yml"
   $logconfigfile = "$etcdir/logging.yml"
 
+  Exec { path => '/usr/bin:/bin:/usr/sbin:/sbin' }
+
   if !defined(Package[$java_package]) {
     package { $java_package:
+      ensure => installed,
+    }
+  }
+
+  if !defined(Package['wget']) {
+    package { 'wget':
       ensure => installed,
     }
   }
@@ -62,18 +70,15 @@ class elasticsearch(
     require => User['elasticsearch'],
   }
 
-  file { $tmptarchive:
-    ensure  => present,
-    source  => "puppet:///elasticsearch/${tarchive}",
-    owner   => 'elasticsearch',
-    mode    => '0644',
+  download { $tmptarchive:
+    uri     => "https://github.com/downloads/elasticsearch/elasticsearch/${tarchive}"
   }
 
   exec { $tmpdir:
     command => "/bin/tar xzf ${tmptarchive}",
     cwd     => "/tmp",
     creates => $tmpdir,
-    require => File[$tmptarchive],
+    require => Download[$tmptarchive],
   }
 
   exec { $sharedirv:
@@ -126,17 +131,30 @@ class elasticsearch(
 
   file { $defaultsfile:
     ensure => present,
-    source => "puppet:///elasticsearch/etc-default-elasticsearch",
+    source => "puppet:///modules/elasticsearch/etc-default-elasticsearch",
   }
 
-  file { $upstartfile:
+  file { $initscript:
     ensure => present,
-    source => "puppet:///elasticsearch/etc-init-elasticsearch.conf",
+    owner => root,
+    group => root,
+    mode => 0755,
+    source => "puppet:///modules/elasticsearch/initd-elasticsearch",
   }
 
   service { 'elasticsearch':
     ensure   => running, 
     enable   => true,
-    provider => upstart,
+    require  => File[$initscript]
+  }
+}
+
+define download ($uri, $timeout = 300) {
+  exec {
+    "download $uri":
+        command => "wget -q '$uri' -O $name",
+        creates => $name,
+        timeout => $timeout,
+        require => Package[ "wget" ],
   }
 }
