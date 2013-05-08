@@ -1,22 +1,22 @@
 # Class: php5-fpm
 #
-# This class manage php5-fpm installation and configuration. 
+# This class manage php5-fpm installation and configuration.
 # Config file 'php5-fpm.conf' is very minimal : only include /etc/php5/fpm/fpm.d/*.conf
-# Use php5-fpm::config for configuring php5-fpm 
+# Use php5-fpm::config for configuring php5-fpm
 #
 # Templates:
 #	- php5-fpm.conf.erb
 #
 class php5 {
 
-	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite, php5-dev, php-pear ]: 
+	package { [ php5-cli, php5-xdebug, php5-gd, php5-curl, php5-memcached, php5-memcache, php5-intl, php5-sqlite, php5-dev, php-pear ]:
 		ensure => latest,
 		notify => Exec["reload-php"],
 	}
 
  	class fpm {
 
-		package { [ php5-fpm ]: 
+		package { [ php5-fpm ]:
 			ensure => latest,
 			notify => Exec["reload-php"],
 		}
@@ -62,7 +62,7 @@ class php5 {
 		    refreshonly => true,
 			require => File["/etc/php5/fpm/php5-fpm.conf"],
 	  	}
-	}	
+	}
 
 	class apache2 {
 		exec{"reload-php":
@@ -79,7 +79,13 @@ class php5 {
 	}
 
   class apc {
-  	package { "php5-apc": 
+
+    $apc_name = $lsbdistcodename ? {
+    	squeeze => "php5-apc",
+    	default => "php-apc"
+    }
+
+  	package { "$apc_name":
   		ensure => latest,
   		notify => Exec["reload-php"]
   	}
@@ -104,12 +110,12 @@ class php5 {
 	#		ensure	=> present,
 	#		content	=> template("php5-fpm/fpm.d/www-pool.conf.erb"),
 	#	}
-	#	
+	#
 
   php5::config { 'dev': }
 
   define fpmconfig ( $ensure = 'present', $content = '', $order="500") {
-		$real_content = $content ? { 
+		$real_content = $content ? {
 			'' => template("php5/fpm.d/${name}.conf.erb"),
   		default => $content,
 	  }
@@ -125,7 +131,7 @@ class php5 {
   }
 
   define config ( $ensure = 'present', $content = '', $order="500") {
-		$real_content = $content ? { 
+		$real_content = $content ? {
 			'' => template("php5/conf.d/${name}.ini.erb"),
   		default => $content,
 	  }
