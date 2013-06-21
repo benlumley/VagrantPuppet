@@ -1,0 +1,31 @@
+{
+  "name": "tubit-elasticsearch",
+  "version": "0.0.1",
+  "source": "UNKNOWN",
+  "author": "Dennis Konert",
+  "license": "Apache License, Version 2.0",
+  "summary": "elasticsearch module for puppet",
+  "description": "elasticsearch module for puppet",
+  "project_page": "https://github.com/tubit/puppet-elasticsearch",
+  "dependencies": [
+
+  ],
+  "types": [
+
+  ],
+  "checksums": {
+    "Modulefile": "610c1b7d31d2031102de9e35a8b68249",
+    "README.md": "a57f8436b95bba5413c5bda0bc65a161",
+    "manifests/config.pp": "a72c2e175549a7d91062687d1f603e69",
+    "manifests/init.pp": "d5f6037c373d0faf91f2c1ecb99f2140",
+    "manifests/package.pp": "48b018315d0eb47b3934e04f9d318416",
+    "manifests/params.pp": "f9fd2fbc72a377c6cd0232eb307f5813",
+    "manifests/plugin/head.pp": "7ec6fe7c2870dafc3a0aab871899bd07",
+    "manifests/service.pp": "ca7d249f770bb5503772a425c0c9ebf6",
+    "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
+    "templates/debian-default-elasticsearch.erb": "a6f136620e707d0cc7b5c9d178f0a6fb",
+    "templates/elasticsearch.yml.erb": "81346ffb35dbe178b6157707869352dc",
+    "templates/logging.yml.erb": "4c4e01504d644f67494d3a12ca1918f9",
+    "tests/init.pp": "33d24101cd07338bef9c7b535521f10d"
+  }
+}

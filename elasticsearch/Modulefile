@@ -1,9 +1,8 @@
-name    'garthk-elasticsearch'
-version '0.1.0'
-author 'garthk'
+name    'tubit-elasticsearch'
+version '0.0.1'
+author 'Dennis Konert'
 license 'Apache License, Version 2.0'
-summary 'Puppet module for elasticsearch on Ubuntu.'
-description "Puppet module for elasticsearch on Ubuntu."
+summary 'elasticsearch module for puppet'
+description 'elasticsearch module for puppet'
+project_page 'https://github.com/tubit/puppet-elasticsearch'
 
-## Add dependencies, if any:
-# dependency 'username/name', '>= 1.2.0'
