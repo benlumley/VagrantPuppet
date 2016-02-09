@@ -144,6 +144,14 @@ class php5 {
 			group => root,
 			notify => Exec["reload-php"],
 		}
+
+		file { "/etc/php5/apache2/conf.d/${order}-${name}.ini":
+			ensure => "/etc/php5/conf.d/${order}-${name}.ini"
+		}
+
+		file { "/etc/php5/cli/conf.d/${order}-${name}.ini":
+			ensure => "/etc/php5/conf.d/${order}-${name}.ini"
+		}
   }
 
   define fpmpool( $ensure = 'present', $port = 9000 ) {
